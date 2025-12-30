@@ -34,7 +34,7 @@ export default function PaymentHistory() {
   const [error, setError] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
-  setLimit(10);
+  // setLimit(10);
   // Modal State
   const [selectedCard, setSelectedCard] = useState<Payment | null>(null);
 
@@ -171,6 +171,7 @@ export default function PaymentHistory() {
               page={page}
               setPage={setPage}
               limit={limit}
+              setLimit={setLimit}
               total={payments.length}
             />
           </div>

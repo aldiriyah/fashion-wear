@@ -4,13 +4,15 @@ interface PaginationProps {
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
   limit: number;
+  setLimit: React.Dispatch<React.SetStateAction<number>>;
   total: number;
 }
 
 export default function Pagination({
   page,
   setPage,
-  limit,
+  limit,  
+  setLimit, 
   total,
 }: PaginationProps) {
   const totalPages = Math.max(1, Math.ceil(total / limit));
@@ -35,6 +37,16 @@ export default function Pagination({
         </button>
 
         <div className="flex items-center gap-2 font-medium">
+          <select
+            value={limit}
+            onChange={(e) => setLimit(Number(e.target.value))}
+            className="px-2 py-1 rounded-full border"
+          >
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
           <span className="px-3 py-1 rounded-full bg-indigo-600 text-white">
             {page}
           </span>
@@ -54,7 +66,7 @@ export default function Pagination({
         >
           Next
         </button>
-      </div>
+        </div>
     </div>
   );
 }

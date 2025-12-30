@@ -36,7 +36,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
         {/* Pricing */}
         <div className="flex items-center space-x-2">
           <span className="text-base sm:text-lg font-bold text-gray-900 flex items-center">
-            <FaDollarSign/>{product.price}
+            <FaDollarSign />
+            {product.price}
           </span>
 
           <span className="text-sm sm:text-base text-gray-500 line-through">
@@ -45,9 +46,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         {/* Choose Options Button */}
-        <Link href={`${product.link}`} target="_blank">
+        <Link
+          href={`/payment?productId=${product._id}&price=${
+            product.price
+          }&title=${encodeURIComponent(
+            product.title
+          )}&image=${encodeURIComponent(product.image || "")}`}
+        >
           <button className="w-full bg-gray-50 hover:bg-gray-100 text-gray-800 font-medium py-2 sm:py-3 px-4 rounded-md transition-colors duration-200 border border-gray-200 text-sm sm:text-base">
-            Choose options
+            Pay Now
           </button>
         </Link>
       </div>

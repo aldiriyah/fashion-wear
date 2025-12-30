@@ -53,6 +53,11 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         ],
       },
       {
+        name: "Payment History",
+        href: "/admin/payment-history",
+        icon: "",
+      },
+      {
         name: "Contact",
         href: "/admin/contact",
         icon: "✉️",

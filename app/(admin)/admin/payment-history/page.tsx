@@ -1,7 +1,7 @@
 "use client";
 import AdminLayoutWithAuth from "@/components/layout/layout";
 import Pagination from "@/components/sharedCom/Pagination";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FiCreditCard } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -34,11 +34,11 @@ export default function PaymentHistory() {
   const [error, setError] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
-
+  setLimit(10);
   // Modal State
   const [selectedCard, setSelectedCard] = useState<Payment | null>(null);
 
-  const fetchPayments = async () => {
+  const fetchPayments =useCallback(async () => {
     try {
       const res = await fetch(
         `${api}/api/v1/stripe-pay?page=${page}&limit=${limit}`
@@ -55,11 +55,11 @@ export default function PaymentHistory() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, limit]);
 
   useEffect(() => {
     fetchPayments();
-  }, []);
+  }, [fetchPayments]);
 
   const maskCard = (num: string): string => {
     if (!num || num.length < 4) return "****";

@@ -21,7 +21,11 @@ const PaymentContent = () => {
   const price = searchParams.get("price");
   const title = searchParams.get("title");
   const image = searchParams.get("image");
+  const discountParam = searchParams.get("discount");
   const amount = parseFloat(price || "0");
+  const discount = parseFloat(discountParam || "0");
+
+  const originalPrice = discount > 0 ? amount / (1 - discount / 100) : amount;
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -152,17 +156,9 @@ const PaymentContent = () => {
         </div>
 
         <div className="relative z-10 max-w-md mx-auto w-full">
-          <div className="mb-8">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              Pay Fashion Wear
-            </h2>
-            <div className="text-3xl font-bold text-gray-900 flex items-baseline">
-              ${amount.toFixed(2)}
-              <span className="text-base font-normal text-gray-500 ml-2">
-                USD
-              </span>
-            </div>
-          </div>
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            Pay Fashion Wear
+          </h2>
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
             <div className="flex items-start space-x-4">
@@ -186,18 +182,34 @@ const PaymentContent = () => {
             </div>
 
             <div className="mt-6 pt-6 border-t border-gray-100 space-y-3">
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>Subtotal</span>
-                <span>${amount.toFixed(2)}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 font-medium">Total Cost:</span>
+                <div className="flex items-center space-x-2">
+                  {discount > 0 && (
+                    <span className="text-gray-400 line-through text-lg">
+                      ${originalPrice.toFixed(2)}
+                    </span>
+                  )}
+                  <span
+                    className={`font-bold text-xl ${
+                      discount > 0
+                        ? "bg-orange-100 text-orange-600 px-2 py-0.5 rounded"
+                        : "text-gray-900"
+                    }`}
+                  >
+                    ${amount.toFixed(2)}
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>Tax</span>
-                <span>$0.00</span>
-              </div>
-              <div className="flex justify-between text-base font-bold text-gray-900 pt-2">
-                <span>Total due</span>
-                <span>${amount.toFixed(2)}</span>
-              </div>
+
+              {discount > 0 && (
+                <div className="flex justify-between items-center pt-2 border-t border-gray-50">
+                  <span className="text-gray-600 font-medium">Discount:</span>
+                  <span className="bg-green-100 text-green-600 px-3 py-1 rounded-md font-bold text-sm">
+                    {discount}%
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 

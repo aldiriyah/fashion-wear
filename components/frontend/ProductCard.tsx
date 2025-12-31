@@ -10,10 +10,19 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   // console.log(product.link);
+  const originalPrice = product.discount
+    ? product.price / (1 - product.discount / 100)
+    : product.price;
+
   return (
     <div className="bg-white relative rounded-lg shadow-sm hover:shadow-md transition-all duration-300 w-full max-w-xs mx-auto border border-gray-100 hover:border-gray-200">
       {/* Product Image */}
       <div className="h-40 sm:h-48 bg-gray-50 flex items-center justify-center p-4 relative">
+        {product.discount > 0 && (
+          <div className="absolute top-2 right-2 bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold z-10">
+            {product.discount}% OFF
+          </div>
+        )}
         <div className="absolute bottom-2 left-4 bg-black text-white px-3 py-1 rounded-full text-xs font-bold z-10">
           Sale
         </div>
@@ -37,19 +46,21 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <div className="flex items-center space-x-2">
           <span className="text-base sm:text-lg font-bold text-gray-900 flex items-center">
             <FaDollarSign />
-            {product.price}
+            {product.price.toFixed(2)}
           </span>
 
-          <span className="text-sm sm:text-base text-gray-500 line-through">
-            %{product.discount}
-          </span>
+          {product.discount > 0 && (
+            <span className="text-sm sm:text-base text-gray-500 line-through">
+              ${originalPrice.toFixed(2)}
+            </span>
+          )}
         </div>
 
         {/* Choose Options Button */}
         <Link
           href={`/payment?productId=${product._id}&price=${
             product.price
-          }&title=${encodeURIComponent(
+          }&discount=${product.discount}&title=${encodeURIComponent(
             product.title
           )}&image=${encodeURIComponent(product.image || "")}`}
         >

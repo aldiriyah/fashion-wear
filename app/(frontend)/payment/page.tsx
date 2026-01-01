@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useEffect } from "react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { FaLock, FaCreditCard, FaCheckCircle } from "react-icons/fa";
 import { IoShieldCheckmark } from "react-icons/io5";
+import { FooterData } from "@/types/FooterTypes";
 
 // Loading component for Suspense
 const PaymentLoading = () => (
@@ -29,7 +30,7 @@ const PaymentContent = () => {
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-
+const [footerData, setFooterData] = useState<FooterData | null>(null);
   const [formData, setFormData] = useState({
     email: "",
     cardHolder: "",
@@ -62,7 +63,23 @@ const PaymentContent = () => {
       cardNumber: formattedValue,
     }));
   };
+ useEffect(() => {
+    const fetchFooterData = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/features/get-footer`
+        );
+        const data = await response.json();
+        if (data?.data) {
+          setFooterData(data?.data);
+        }
+      } catch (error) {
+        console.error("Error fetching footer data:", error);
+      }
+    };
 
+    fetchFooterData();
+  }, []);
   // Format expiry date (MM/YY)
   const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/\D/g, "");
@@ -157,7 +174,7 @@ const PaymentContent = () => {
 
         <div className="relative z-10 max-w-md mx-auto w-full">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
-            Pay Fashion Wear
+            Pay {footerData?.title}
           </h2>
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
@@ -215,7 +232,7 @@ const PaymentContent = () => {
 
           <div className="flex items-center space-x-2 text-sm text-gray-500">
             <IoShieldCheckmark className="text-green-500 text-lg" />
-            <span>Secure payment powered by Fashion Wear</span>
+            <span>Secure payment powered by {footerData?.title}</span>
           </div>
         </div>
       </div>
@@ -346,7 +363,7 @@ const PaymentContent = () => {
             </button>
 
             <p className="text-center text-xs text-gray-400 mt-4">
-              By confirming your payment, you allow Fashion Wear to charge your
+              By confirming your payment, you allow {footerData?.title} to charge your
               card for this payment and future payments in accordance with their
               terms.
             </p>

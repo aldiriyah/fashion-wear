@@ -25,6 +25,7 @@ export default function CreateProductPage() {
     description: "",
     discount: 0,
     link: "",
+    productType: "all",
   });
   const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -70,6 +71,7 @@ export default function CreateProductPage() {
 
     const data = new FormData();
     Object.keys(formData).forEach((key) => {
+      if (key === "image") return; // Skip image from formData as we append the File object separately
       const value = formData[key as keyof ProductType];
       if (value !== undefined && value !== null) {
         data.append(key, value.toString());
@@ -94,6 +96,7 @@ export default function CreateProductPage() {
           description: "",
           discount: 0,
           link: "",
+          productType: "all",
         });
         setImage(null);
         setImageError("");

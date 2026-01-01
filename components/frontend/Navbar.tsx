@@ -1,4 +1,5 @@
 "use client";
+import { FooterData } from "@/types/FooterTypes";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
@@ -7,6 +8,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [footerData, setFooterData] = useState<FooterData | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,8 +31,26 @@ const Navbar = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  useEffect(() => {
+    const fetchFooterData = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/features/get-footer`
+        );
+        const data = await response.json();
+        if (data?.data) {
+          setFooterData(data?.data);
+        }
+      } catch (error) {
+        console.error("Error fetching footer data:", error);
+      }
+    };
+
+    fetchFooterData();
+  }, []);
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+    <nav className="fixed top-0   left-0 right-0 z-50 bg-white shadow-sm">
       {/* Top Contact Bar */}
       <div
         className={`bg-gray-800 transition-all duration-500 ease-out ${
@@ -48,20 +68,21 @@ const Navbar = () => {
 
       {/* Main Navigation Bar */}
       <div
-        className={`bg-white transition-all duration-500 ease-out ${
-          isVisible ? "translate-y-0" : "-translate-y-2"
+        className={`bg-white transition-all  duration-500 ease-out ${
+          isVisible ? "translate-y-0" : "-translate-y-2 pt-3"
         }`}
       >
-        <div className="container mx-auto flex items-center justify-between md:justify-start gap-10 text-black px-6 md:px-0 py-1">
+        <div className="container mx-auto flex  items-center justify-between md:justify-start gap-10 text-black px-6 md:px-0 py-1">
           {/* logo */}
           <div className="flex-shrink-0">
             <Image
-              src="/logo2.JPG"
+              src={footerData?.companyInfo.logo || ""}
               alt="logo"
-              width={100}
-              height={100}
-              className="w-12 h-10 md:w-14 md:h-14 lg:w-16 lg:h-16 transition-transform duration-300 hover:scale-105"
+              width={60}
+              height={60}
+              className=" transition-transform duration-300 hover:scale-105"
             />
+            {/* {footerData?.title} */}
           </div>
 
           {/* Desktop Navigation */}

@@ -43,6 +43,7 @@ export interface ContactInfo {
 export interface FooterData {
   _id?: string | undefined;
   title: string;
+  
   companyInfo: CompanyInfo;
   categories: Category[];
   informationLinks: InformationLink[];

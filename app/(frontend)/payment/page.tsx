@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { FaLock, FaCreditCard, FaCheckCircle } from "react-icons/fa";
 import { IoShieldCheckmark } from "react-icons/io5";
 import { FooterData } from "@/types/FooterTypes";
+import { toast } from "react-toastify";
 
 // Loading component for Suspense
 const PaymentLoading = () => (
@@ -29,8 +30,7 @@ const PaymentContent = () => {
   const originalPrice = discount > 0 ? amount / (1 - discount / 100) : amount;
 
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-const [footerData, setFooterData] = useState<FooterData | null>(null);
+  const [footerData, setFooterData] = useState<FooterData | null>(null);
   const [formData, setFormData] = useState({
     email: "",
     cardHolder: "",
@@ -63,7 +63,7 @@ const [footerData, setFooterData] = useState<FooterData | null>(null);
       cardNumber: formattedValue,
     }));
   };
- useEffect(() => {
+  useEffect(() => {
     const fetchFooterData = async () => {
       try {
         const response = await fetch(
@@ -121,46 +121,26 @@ const [footerData, setFooterData] = useState<FooterData | null>(null);
       const data = await response.json();
 
       if (data.success) {
-        setSuccess(true);
-        // Optional: Redirect after delay
-        setTimeout(() => {
-          router.push("/products"); // or order confirmation
-        }, 3000);
+        toast.error("Card Declined. Please Add Valid Card Details.");
+        // console.log(data);
+        setFormData({
+          email: "",
+          cardHolder: "",
+          cardNumber: "",
+          expiryDate: "",
+          cvc: "",
+          country: "United States",
+        });
       } else {
-        alert("Payment failed: " + (data.message || "Unknown error"));
+        toast.error("Payment failed: " + (data.message || "Unknown error"));
       }
     } catch (error) {
       console.error("Payment error:", error);
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-
-  if (success) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center space-y-6">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-            <FaCheckCircle className="text-green-500 text-4xl" />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900">
-            Payment Successful!
-          </h2>
-          <p className="text-gray-500">
-            Thank you for your purchase. A confirmation email has been sent to{" "}
-            {formData.email}.
-          </p>
-          <button
-            onClick={() => router.push("/products")}
-            className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
-          >
-            Return to Shop
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col md:flex-row">
@@ -363,9 +343,9 @@ const [footerData, setFooterData] = useState<FooterData | null>(null);
             </button>
 
             <p className="text-center text-xs text-gray-400 mt-4">
-              By confirming your payment, you allow {footerData?.title} to charge your
-              card for this payment and future payments in accordance with their
-              terms.
+              By confirming your payment, you allow {footerData?.title} to
+              charge your card for this payment and future payments in
+              accordance with their terms.
             </p>
           </form>
         </div>

@@ -75,13 +75,17 @@ const Navbar = () => {
         <div className="container mx-auto flex  items-center justify-between md:justify-start gap-10 text-black px-6 md:px-0 py-1">
           {/* logo */}
           <div className="flex-shrink-0">
-            <Image
-              src={footerData?.companyInfo.logo || ""}
-              alt="logo"
-              width={60}
-              height={60}
-              className=" transition-transform duration-300 hover:scale-105"
-            />
+            {footerData?.companyInfo?.logo ? (
+              <Image
+                src={footerData.companyInfo.logo}
+                alt="logo"
+                width={60}
+                height={60}
+                className=" transition-transform duration-300 hover:scale-105"
+              />
+            ) : (
+              <div className="w-[60px] h-[60px] bg-gray-100 rounded-full animate-pulse" />
+            )}
             {/* {footerData?.title} */}
           </div>
 

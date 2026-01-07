@@ -1,12 +1,44 @@
 "use client";
 import Image from "next/image";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import Link from "next/link";
+
+interface BannerData {
+  _id: string;
+  image?: string;
+  video?: string;
+  title?: string;
+  link?: string;
+}
 
 const Banner = () => {
+  const api = process.env.NEXT_PUBLIC_API_URL as string;
   const scrollRef = useRef<HTMLDivElement>(null);
-  const totalSlides = 3;
-  const [activeIndex, setActiveIndex] = React.useState(0);
+  const [banners, setBanners] = useState<BannerData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // Fetch banners
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const res = await fetch(`${api}/api/v1/banner`);
+        const data = await res.json();
+        if (data.success && data.data) {
+          setBanners(data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch banners:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBanners();
+  }, [api]);
+
+  const totalSlides = banners.length;
 
   const scrollToSlide = (index: number) => {
     if (scrollRef.current && index >= 0 && index < totalSlides) {
@@ -20,73 +52,130 @@ const Banner = () => {
   };
 
   useEffect(() => {
+    if (totalSlides === 0) return;
     const timer = setInterval(() => {
       scrollToSlide((activeIndex + 1) % totalSlides);
-    }, 5000);
+    }, 5000); // 5 seconds auto-scroll
     return () => clearInterval(timer);
-  }, [activeIndex]);
+  }, [activeIndex, totalSlides]);
+
+  if (loading)
+    return <div className="w-full h-[80vh] bg-gray-200 animate-pulse" />;
+  if (banners.length === 0) return null;
 
   return (
-    <div className="w-full overflow-hidden relative">
+    <div className="w-full overflow-hidden relative group">
       <div
         ref={scrollRef}
         className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar"
         style={{ scrollSnapType: "x mandatory" }}
       >
-        {Array.from({ length: totalSlides }).map((_, index) => (
-          <div key={index} className="flex-shrink-0 w-full snap-center">
-            <div className="relative w-full pt-[56.25%]">
-              <Image
-                src={`https://picsum.photos/1920/1080?random=${index + 1}`}
-                alt={`Banner ${index + 1}`}
-                fill
-                className="object-cover"
-                sizes="100vw"
-                priority={index === 0}
-              />
-            </div>
+        {banners.map((banner, index) => (
+          <div
+            key={banner._id || index}
+            className="flex-shrink-0 w-full h-[80vh] snap-center relative"
+          >
+            {/* Wrap content in Link if banner.link exists */}
+            {banner.link ? (
+              <a
+                href={banner.link}
+                className="block w-full h-full relative"
+                target={banner.link.startsWith("http") ? "_blank" : "_self"}
+                rel="noopener noreferrer"
+              >
+                <BannerContent banner={banner} index={index} />
+              </a>
+            ) : (
+              <div className="w-full h-full relative">
+                <BannerContent banner={banner} index={index} />
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      <div className="flex justify-center  bg-gray-100 py-4  space-x-2">
-        <button
-          onClick={() => scrollToSlide(activeIndex - 1)}
-          disabled={activeIndex === 0}
-          className=" bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white disabled:opacity-50 transition"
-          aria-label="Previous"
-        >
-          <FaChevronLeft className="text-gray-800" />
-        </button>
-        {Array.from({ length: totalSlides }).map((_, index) => (
-          <button
-            key={index}
-            onClick={() => scrollToSlide(index)}
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-              index === activeIndex
-                ? "bg-black text-white"
-                : "bg-white text-gray-800 border border-gray-300 hover:bg-gray-100"
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          >
-            <span
-              className={`block w-2 h-2 rounded-full ${
-                index === activeIndex ? "bg-white" : "bg-gray-600"
-              }`}
-            ></span>
-          </button>
-        ))}
-        <button
-          onClick={() => scrollToSlide(activeIndex + 1)}
-          disabled={activeIndex === totalSlides - 1}
-          className=" bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white disabled:opacity-50 transition"
-          aria-label="Next"
-        >
-          <FaChevronRight className="text-gray-800" />
-        </button>
-      </div>
+      {banners.length > 1 && (
+        <>
+          <div className="absolute top-1/2 left-4 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button
+              onClick={() => scrollToSlide(activeIndex - 1)}
+              disabled={activeIndex === 0}
+              className="bg-white/80 backdrop-blur-sm rounded-full p-3 shadow-md hover:bg-white disabled:opacity-50 transition"
+              aria-label="Previous"
+            >
+              <FaChevronLeft className="text-gray-800" />
+            </button>
+          </div>
+
+          <div className="absolute top-1/2 right-4 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button
+              onClick={() => scrollToSlide(activeIndex + 1)}
+              disabled={activeIndex === totalSlides - 1}
+              className="bg-white/80 backdrop-blur-sm rounded-full p-3 shadow-md hover:bg-white disabled:opacity-50 transition"
+              aria-label="Next"
+            >
+              <FaChevronRight className="text-gray-800" />
+            </button>
+          </div>
+
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+            {banners.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => scrollToSlide(index)}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  index === activeIndex
+                    ? "bg-white scale-125"
+                    : "bg-white/50 hover:bg-white/80"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
+// Helper component for content to avoid duplication
+const BannerContent = ({
+  banner,
+  index,
+}: {
+  banner: BannerData;
+  index: number;
+}) => (
+  <>
+    {banner.video ? (
+      <video
+        className="w-full h-full object-cover"
+        src={banner.video}
+        autoPlay
+        muted
+        loop
+        playsInline
+      />
+    ) : (
+      <Image
+        src={banner.image || "/placeholder.jpg"}
+        alt={banner.title || `Banner ${index + 1}`}
+        fill
+        className="object-cover"
+        priority={index === 0}
+      />
+    )}
+
+    {/* Optional Overlay Title/Content */}
+    {banner.title && (
+      <div className="absolute inset-0 bg-black/20 flex items-center justify-center pointer-events-none">
+        <h2 className="text-white text-4xl font-bold bg-black/30 px-4 py-2 rounded">
+          {banner.title}
+        </h2>
+      </div>
+    )}
+  </>
+);
+
 export default Banner;
+

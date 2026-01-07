@@ -1,185 +1,376 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { useEffect, useState, useCallback } from "react";
-import { FiX } from "react-icons/fi";
+import {
+  FiTrash2,
+  FiPlus,
+  FiLink,
+  FiType,
+  FiImage,
+  FiVideo,
+} from "react-icons/fi";
 
+// Define the interface based on the backend model
 interface Banner {
   _id: string;
-  title: string;
-  image: string[];
+  title?: string;
+  link?: string;
+  image?: string;
+  video?: string;
+  isActive: boolean;
 }
 
-export default function BannerForm() {
+export default function BannerManagement() {
   const api = process.env.NEXT_PUBLIC_API_URL as string;
-  const [existingBanner, setExistingBanner] = useState<Banner | null>(null);
-  const [images, setImages] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
- 
-  const fetchBanner = useCallback(async () => {
+  // Form State
+  const [title, setTitle] = useState("");
+  const [link, setLink] = useState("");
+  const [mediaType, setMediaType] = useState<"image" | "video">("image");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const fetchBanners = useCallback(async () => {
+    setLoading(true);
     try {
-      const response = await fetch(`${api}/api/v1/features/find-banner`);
-      if (response.ok) {
-        const data = await response.json();
-        setExistingBanner(data.data);
+      const response = await fetch(`${api}/api/v1/banner`);
+      const result = await response.json();
+      if (result.success) {
+        setBanners(result.data);
+      } else {
+        console.error("Failed to fetch banners:", result.message);
       }
     } catch (error) {
-      console.error("Error fetching banner:", error);
+      console.error("Error fetching banners:", error);
+    } finally {
+      setLoading(false);
     }
-  }, [api, ]);
+  }, [api]);
 
   useEffect(() => {
-    fetchBanner();
-  }, [fetchBanner]);
+    fetchBanners();
+  }, [fetchBanners]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files ? Array.from(e.target.files) : [];
-    setImages(files);
-    setPreviewUrls(files.map((file) => URL.createObjectURL(file)));
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
   };
 
-
-  const handleDeleteExisting = (index: number) => {
-    if (!existingBanner) return;
-    const updatedImages = existingBanner.image.filter((_, i) => i !== index);
-    setExistingBanner({ ...existingBanner, image: updatedImages });
+  const resetForm = () => {
+    setTitle("");
+    setLink("");
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setMessage(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCreateBanner = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage("");
-
-    const formData = new FormData();
-    images.forEach((file) => formData.append("image", file));
-
-   
-    if (existingBanner?.image) {
-      formData.append("existingImages", JSON.stringify(existingBanner.image));
+    if (!selectedFile) {
+      setMessage({ type: "error", text: "Please select an image or video." });
+      return;
     }
 
+    setSubmitting(true);
+    setMessage(null);
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("link", link);
+    formData.append(mediaType, selectedFile); // Append as 'image' or 'video'
+
     try {
-      const response = await fetch(`${api}/api/v1/features/create-banner`, {
+      const response = await fetch(`${api}/api/v1/banner/create`, {
         method: "POST",
         body: formData,
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Failed to upload banner");
+      const result = await response.json();
 
-      setMessage(data.message);
-      setImages([]);
-      setPreviewUrls([]);
-      fetchBanner();
-    } catch (error: unknown) {
-      console.error("Error uploading banner:", error);
-      setMessage(error instanceof Error ? error.message : "Unknown error");
+      if (response.ok && result.success) {
+        setMessage({ type: "success", text: "Banner created successfully!" });
+        resetForm();
+        fetchBanners();
+      } else {
+        setMessage({
+          type: "error",
+          text: result.message || "Failed to create banner.",
+        });
+      }
+    } catch (error) {
+      console.error("Error creating banner:", error);
+      setMessage({
+        type: "error",
+        text: "An error occurred while creating the banner.",
+      });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteBanner = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this banner?")) return;
+
+    try {
+      const response = await fetch(`${api}/api/v1/banner/${id}`, {
+        method: "DELETE",
+      });
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setBanners((prev) => prev.filter((b) => b._id !== id));
+      } else {
+        alert(result.message || "Failed to delete banner");
+      }
+    } catch (error) {
+      console.error("Error deleting banner:", error);
+      alert("An error occurred while deleting the banner.");
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-2xl mt-10">
-      <h2 className="text-2xl font-semibold mb-4 text-center">
-        Manage Smartwear Banner
-      </h2>
+    <div className="space-y-8">
+      {/* Create Banner Form */}
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+          <FiPlus className="text-blue-600" />
+          Add New Banner
+        </h2>
 
-      
-     {(existingBanner?.image?.length ?? 0) > 0 && (
-        <div className="mb-6">
-          <h3 className="font-medium mb-2">Current Banner Images:</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {existingBanner?.image.map((url, idx) => (
-              <div key={idx} className="relative group">
-                <Image
-                  src={url}
-                  alt={`banner-${idx}`}
-                  width={120}
-                  height={80}
-                  className="w-full h-40 object-cover rounded-lg border"
+        <form onSubmit={handleCreateBanner} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left Column: Inputs */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Title (Optional)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-3 text-gray-400">
+                    <FiType />
+                  </span>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Enter banner title"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Link URL (Optional)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-3 text-gray-400">
+                    <FiLink />
+                  </span>
+                  <input
+                    type="text"
+                    value={link}
+                    onChange={(e) => setLink(e.target.value)}
+                    placeholder="e.g., /products/sale"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Media Type
+                </label>
+                <div className="flex gap-4">
+                  <label
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
+                      mediaType === "image"
+                        ? "bg-blue-50 border-blue-200 text-blue-700"
+                        : "hover:bg-gray-50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="mediaType"
+                      value="image"
+                      checked={mediaType === "image"}
+                      onChange={() => setMediaType("image")}
+                      className="hidden"
+                    />
+                    <FiImage /> Image
+                  </label>
+                  <label
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
+                      mediaType === "video"
+                        ? "bg-blue-50 border-blue-200 text-blue-700"
+                        : "hover:bg-gray-50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="mediaType"
+                      value="video"
+                      checked={mediaType === "video"}
+                      onChange={() => setMediaType("video")}
+                      className="hidden"
+                    />
+                    <FiVideo /> Video
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Upload File
+                </label>
+                <input
+                  type="file"
+                  accept={mediaType === "image" ? "image/*" : "video/*"}
+                  onChange={handleFileChange}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors"
                 />
-              
-                <button
-                  type="button"
-                  onClick={() => handleDeleteExisting(idx)}
-                  className="absolute top-2 right-2 bg-white/80 text-red-600 hover:text-red-700 rounded-full p-1 shadow transition-opacity opacity-0 group-hover:opacity-100"
-                  title="Delete this image"
-                >
-                  <FiX size={18} />
-                </button>
+              </div>
+            </div>
+
+            {/* Right Column: Preview */}
+            <div className="flex items-center justify-center bg-gray-50 rounded-xl border border-dashed border-gray-300 min-h-[200px] overflow-hidden relative">
+              {previewUrl ? (
+                mediaType === "image" ? (
+                  <Image
+                    src={previewUrl}
+                    alt="Preview"
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <video
+                    src={previewUrl}
+                    controls
+                    className="w-full h-full max-h-[300px]"
+                  />
+                )
+              ) : (
+                <div className="text-center text-gray-400">
+                  <p className="text-sm">Media Preview</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            {message && (
+              <span
+                className={`text-sm ${
+                  message.type === "success" ? "text-green-600" : "text-red-500"
+                }`}
+              >
+                {message.text}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={resetForm}
+              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitting || !selectedFile}
+              className={`px-6 py-2 rounded-lg text-white font-medium shadow-sm transition-all ${
+                submitting || !selectedFile
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 hover:shadow-md"
+              }`}
+            >
+              {submitting ? "Creating..." : "Create Banner"}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Banner List */}
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-800 mb-6">
+          Existing Banners
+        </h3>
+
+        {loading ? (
+          <div className="text-center py-10 text-gray-500">
+            Loading banners...
+          </div>
+        ) : banners.length === 0 ? (
+          <div className="text-center py-10 bg-gray-50 rounded-lg text-gray-500">
+            No banners found. Add one above!
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {banners.map((banner) => (
+              <div
+                key={banner._id}
+                className="group relative bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+              >
+                <div className="relative h-48 w-full bg-gray-100">
+                  {banner.video ? (
+                    <video
+                      src={banner.video}
+                      className="w-full h-full object-cover"
+                      controls
+                    />
+                  ) : (
+                    <Image
+                      src={banner.image || "/placeholder.png"}
+                      alt={banner.title || "Banner"}
+                      fill
+                      className="object-cover"
+                    />
+                  )}
+                  {/* Overlay for quick actions */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => handleDeleteBanner(banner._id)}
+                      className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-transform hover:scale-110"
+                      title="Delete Banner"
+                    >
+                      <FiTrash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-4">
+                  <h4
+                    className="font-semibold text-gray-800 truncate"
+                    title={banner.title}
+                  >
+                    {banner.title || "Untitled Banner"}
+                  </h4>
+                  {banner.link && (
+                    <a
+                      href={banner.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline flex items-center gap-1 mt-1 truncate"
+                    >
+                      <FiLink size={12} /> {banner.link}
+                    </a>
+                  )}
+                </div>
               </div>
             ))}
           </div>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-      
-        <div>
-          <label
-            htmlFor="images"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Upload New Images
-          </label>
-          <input
-            type="file"
-            id="images"
-            accept="image/*"
-            multiple
-            onChange={handleImageChange}
-            className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none"
-          />
-        </div>
-
-        
-        {previewUrls.length > 0 && (
-          <div>
-            <h4 className="text-sm font-medium mb-2">Preview (New Uploads):</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {previewUrls.map((url, idx) => (
-                <Image
-                  key={idx}
-                  src={url}
-                  width={120}
-                  height={80}
-                  alt={`preview-${idx}`}
-                  className="w-full h-40 object-cover rounded-lg border"
-                />
-              ))}
-            </div>
-          </div>
         )}
-
-      
-        <button
-          type="submit"
-          disabled={loading || (images.length === 0 && !existingBanner?.image?.length)}
-          className={`w-full py-2 rounded-lg text-white font-medium transition ${
-            loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
-        >
-          {loading ? "Uploading..." : "Update Banner"}
-        </button>
-
-        {message && (
-          <p
-            className={`text-center text-sm mt-2 ${
-              message.includes("successfully")
-                ? "text-green-600"
-                : "text-red-500"
-            }`}
-          >
-            {message}
-          </p>
-        )}
-      </form>
+      </div>
     </div>
   );
 }

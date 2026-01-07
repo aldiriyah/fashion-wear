@@ -10,6 +10,15 @@ const Navbar = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [footerData, setFooterData] = useState<FooterData | null>(null);
 
+  // Dynamic Navbar State
+  interface NavbarItem {
+    _id: string;
+    name: string;
+    slug: string;
+    isActive: boolean;
+  }
+  const [dynamicNavItems, setDynamicNavItems] = useState<NavbarItem[]>([]);
+
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -46,7 +55,22 @@ const Navbar = () => {
       }
     };
 
+    const fetchNavbarItems = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/navbar`
+        );
+        const result = await response.json();
+        if (result.success && Array.isArray(result.data)) {
+          setDynamicNavItems(result.data);
+        }
+      } catch (error) {
+        console.error("Error fetching navbar items:", error);
+      }
+    };
+
     fetchFooterData();
+    fetchNavbarItems();
   }, []);
 
   return (
@@ -108,14 +132,18 @@ const Navbar = () => {
                   All Products
                 </Link>
               </li>
-              <li>
-                <Link
-                  href={"/t-shirts"}
-                  className="hover:text-gray-600 transition-all duration-300 ease-out py-2 border-b-2 border-transparent hover:border-gray-600"
-                >
-                  T-Shirts
-                </Link>
-              </li>
+              
+              {/* Dynamic Items */}
+              {dynamicNavItems.map((item) => (
+                <li key={item._id}>
+                  <Link
+                    href={`/${item.slug}`}
+                    className="hover:text-gray-600 transition-all duration-300 ease-out py-2 border-b-2 border-transparent hover:border-gray-600"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
               <li>
                 <Link
                   href="/contact-us"
@@ -194,6 +222,18 @@ const Navbar = () => {
               T-Shirts
             </Link>
           </li>
+          {/* Dynamic Items Mobile */}
+          {dynamicNavItems.map((item) => (
+            <li key={item._id} className="w-full text-center">
+              <Link
+                href={`/${item.slug}`}
+                className="block py-3 px-4 hover:text-gray-600 transition-all duration-300 ease-out hover:bg-gray-50 rounded-lg mx-4"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {item.name}
+              </Link>
+            </li>
+          ))}
           <li className="w-full text-center">
             <Link
               href="/contact"

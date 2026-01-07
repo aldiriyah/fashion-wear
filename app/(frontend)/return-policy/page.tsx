@@ -2,6 +2,22 @@ import { policySections as staticPolicySections } from "@/types/constants/return
 import { fetchContent } from "@/services/contentService";
 import React from "react";
 
+interface ReturnPolicyProcess {
+  title: string;
+  steps: string[];
+}
+
+interface ReturnPolicySection {
+  id: number | string;
+  title: string;
+  icon: React.ReactNode;
+  content: string;
+  list?: string[];
+  process?: ReturnPolicyProcess;
+  note?: string;
+  warning?: string;
+}
+
 const ReturnPolicy = async () => {
   const dynamicContent = await fetchContent("return-policy");
   const policySections = dynamicContent || staticPolicySections;
@@ -62,7 +78,7 @@ const ReturnPolicy = async () => {
 
         {/* Policy Sections */}
         <div className="space-y-8">
-          {policySections.map((section: any) => (
+          {policySections.map((section: ReturnPolicySection) => (
             <div
               key={section.id}
               className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group"
@@ -90,7 +106,7 @@ const ReturnPolicy = async () => {
                   {/* List Items */}
                   {section.list && (
                     <ul className="space-y-3 mt-4 mb-4">
-                      {section.list.map((item: any, index: number) => (
+                      {section.list.map((item: string, index: number) => (
                         <li
                           key={index}
                           className="flex items-start gap-3 text-gray-600"
@@ -122,7 +138,7 @@ const ReturnPolicy = async () => {
                       </h4>
                       <ol className="space-y-2">
                         {section.process.steps.map(
-                          (step: any, index: number) => (
+                          (step: string, index: number) => (
                             <li
                               key={index}
                               className="flex items-start gap-3 text-blue-700"

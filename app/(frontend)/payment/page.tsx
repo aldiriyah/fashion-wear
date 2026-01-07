@@ -2,8 +2,8 @@
 
 import React, { useState, Suspense, useEffect } from "react";
 import Image from "next/image";
-import { useSearchParams, useRouter } from "next/navigation";
-import { FaLock, FaCreditCard, FaCheckCircle } from "react-icons/fa";
+import { useSearchParams } from "next/navigation";
+import { FaLock, FaCreditCard } from "react-icons/fa";
 import { IoShieldCheckmark } from "react-icons/io5";
 import { FooterData } from "@/types/FooterTypes";
 import { toast } from "react-toastify";
@@ -17,7 +17,6 @@ const PaymentLoading = () => (
 
 const PaymentContent = () => {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const productId = searchParams.get("productId");
   const price = searchParams.get("price");

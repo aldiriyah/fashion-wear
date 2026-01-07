@@ -11,8 +11,23 @@ import {
   FaTiktok,
 } from "react-icons/fa";
 
+interface ContactInfo {
+  address: string;
+  phones: string[];
+  socials: {
+    facebook: string;
+    twitter: string;
+    instagram: string;
+    tiktok: string;
+  };
+  hours: {
+    sunday_thursday: string;
+    friday_saturday: string;
+  };
+}
+
 interface ContactUsClientProps {
-  contactInfo: any;
+  contactInfo: ContactInfo | null;
 }
 
 const api = process.env.NEXT_PUBLIC_API_URL;

@@ -1,6 +1,20 @@
 import { policySections as staticPolicySections } from "@/types/constants/privacy";
 import { fetchContent } from "@/services/contentService";
 import React from "react";
+interface PolicySubsection {
+  title: string;
+  content: string;
+}
+
+interface PolicySection {
+  id: number | string;
+  title: string;
+  icon: React.ReactNode;
+  content: string;
+  subsections?: PolicySubsection[];
+  list?: string[];
+  note?: string;
+}
 
 const PrivacyPolicy = async () => {
   const dynamicContent = await fetchContent("privacy-policy");
@@ -39,7 +53,7 @@ const PrivacyPolicy = async () => {
 
         {/* Policy Sections */}
         <div className="space-y-8">
-          {policySections.map((section: any) => (
+          {policySections.map((section: PolicySection) => (
             <div
               key={section.id}
               className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden"
@@ -63,7 +77,7 @@ const PrivacyPolicy = async () => {
                   {section.subsections && (
                     <div className="space-y-4 mt-6">
                       {section.subsections.map(
-                        (subsection: any, index: number) => (
+                        (subsection: PolicySubsection, index: number) => (
                           <div
                             key={index}
                             className="bg-gray-50 rounded-lg p-4"
@@ -83,7 +97,7 @@ const PrivacyPolicy = async () => {
                   {/* List Items */}
                   {section.list && (
                     <ul className="space-y-2 mt-4">
-                      {section.list.map((item: any, index: number) => (
+                      {section.list.map((item: string, index: number) => (
                         <li
                           key={index}
                           className="flex items-start gap-2 text-gray-600"

@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Link from "next/link";
 
@@ -40,16 +40,19 @@ const Banner = () => {
 
   const totalSlides = banners.length;
 
-  const scrollToSlide = (index: number) => {
-    if (scrollRef.current && index >= 0 && index < totalSlides) {
-      const cardWidth = scrollRef.current.children[0]?.clientWidth || 0;
-      scrollRef.current.scrollTo({
-        left: cardWidth * index,
-        behavior: "smooth",
-      });
-      setActiveIndex(index);
-    }
-  };
+  const scrollToSlide = useCallback(
+    (index: number) => {
+      if (scrollRef.current && index >= 0 && index < totalSlides) {
+        const cardWidth = scrollRef.current.children[0]?.clientWidth || 0;
+        scrollRef.current.scrollTo({
+          left: cardWidth * index,
+          behavior: "smooth",
+        });
+        setActiveIndex(index);
+      }
+    },
+    [totalSlides]
+  );
 
   useEffect(() => {
     if (totalSlides === 0) return;
@@ -57,7 +60,7 @@ const Banner = () => {
       scrollToSlide((activeIndex + 1) % totalSlides);
     }, 5000); // 5 seconds auto-scroll
     return () => clearInterval(timer);
-  }, [activeIndex, totalSlides]);
+  }, [activeIndex, totalSlides, scrollToSlide]);
 
   if (loading)
     return <div className="w-full h-[80vh] bg-gray-200 animate-pulse" />;
@@ -77,14 +80,14 @@ const Banner = () => {
           >
             {/* Wrap content in Link if banner.link exists */}
             {banner.link ? (
-              <a
+              <Link
                 href={banner.link}
                 className="block w-full h-full relative"
                 target={banner.link.startsWith("http") ? "_blank" : "_self"}
                 rel="noopener noreferrer"
               >
                 <BannerContent banner={banner} index={index} />
-              </a>
+              </Link>
             ) : (
               <div className="w-full h-full relative">
                 <BannerContent banner={banner} index={index} />
@@ -178,4 +181,3 @@ const BannerContent = ({
 );
 
 export default Banner;
-

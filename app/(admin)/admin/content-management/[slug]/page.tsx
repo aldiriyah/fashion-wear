@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { fetchContent } from "@/services/contentService"; // Reusing the public service for fetching initial data server-side
 import ShippingForm from "@/components/admin/content/ShippingForm";
 import PolicyForm from "@/components/admin/content/PolicyForm";
@@ -27,7 +28,7 @@ const EditContentPage = async ({ params }: PageProps) => {
   if (!contentData) {
     return (
       <div className="p-8 text-red-600">
-        Error: Content not found for slug "{slug}"
+        Error: Content not found for slug &quot;{slug}&quot;
       </div>
     );
   }
@@ -61,19 +62,21 @@ const EditContentPage = async ({ params }: PageProps) => {
 
   return (
     <AdminLayoutWithAuth>
-    <div className="bg-white rounded-lg shadow-sm p-6 min-h-[80vh]">
-      <div className="flex justify-between items-center mb-6 border-b pb-4">
-        <h1 className="text-2xl font-bold text-gray-800">Edit {getTitle()}</h1>
-        <a
-          href="/admin/content-management"
-          className="text-sm text-blue-600 hover:underline"
-        >
-          &larr; Back to Dashboard
-        </a>
-      </div>
+      <div className="bg-white rounded-lg shadow-sm p-6 min-h-[80vh]">
+        <div className="flex justify-between items-center mb-6 border-b pb-4">
+          <h1 className="text-2xl font-bold text-gray-800">
+            Edit {getTitle()}
+          </h1>
+          <Link
+            href="/admin/content-management"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            &larr; Back to Dashboard
+          </Link>
+        </div>
 
-      {renderForm()}
-    </div>
+        {renderForm()}
+      </div>
     </AdminLayoutWithAuth>
   );
 };

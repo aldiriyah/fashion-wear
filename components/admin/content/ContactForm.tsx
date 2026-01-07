@@ -30,7 +30,8 @@ const ContactForm: React.FC<Props> = ({ initialData, slug }) => {
   // Simplified handler for nested updates
   const updateField = (path: string[], value: string) => {
     const newData = { ...data };
-    let current: any = newData;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let current: Record<string, any> = newData;
     for (let i = 0; i < path.length - 1; i++) {
       current = current[path[i]];
     }

@@ -3,12 +3,25 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { updateContent } from "@/services/adminContentService";
 import { FaPlus, FaTrash } from "react-icons/fa";
-import PolicyForm from "./PolicyForm";
 
 // Helper type for the main structure
+interface CookieSection {
+  id: string | number;
+  title: string;
+  icon: React.ReactNode;
+  content: string;
+  list?: string[];
+}
+
+interface CookieType {
+  type: string;
+  purpose: string;
+  examples: string;
+}
+
 interface CookieStructure {
-  sections: any[];
-  cookieTypes: any[];
+  sections: CookieSection[];
+  cookieTypes: CookieType[];
 }
 
 interface Props {
@@ -28,15 +41,21 @@ const CookiePolicyForm: React.FC<Props> = ({ initialData, slug }) => {
 
   // Or I manually implement both here to keep it clean.
 
-  const [sections, setSections] = useState<any[]>(initialData.sections || []);
-  const [cookieTypes, setCookieTypes] = useState<any[]>(
+  const [sections, setSections] = useState<CookieSection[]>(
+    initialData.sections || []
+  );
+  const [cookieTypes, setCookieTypes] = useState<CookieType[]>(
     initialData.cookieTypes || []
   );
   const [activeTab, setActiveTab] = useState<"sections" | "types">("sections");
   const [saving, setSaving] = useState(false);
 
   // --- Sections Helpers (Simplified version of PolicyForm logic) ---
-  const handleSectionChange = (index: number, field: string, value: any) => {
+  const handleSectionChange = (
+    index: number,
+    field: keyof CookieSection,
+    value: string | string[]
+  ) => {
     const newSections = [...sections];
     newSections[index] = { ...newSections[index], [field]: value };
     setSections(newSections);
@@ -158,7 +177,7 @@ const CookiePolicyForm: React.FC<Props> = ({ initialData, slug }) => {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
                     />
                     <p className="text-xs text-gray-400 mt-1">
-                      Separate items with " | "
+                      Separate items with &quot; | &quot;
                     </p>
                   </div>
                 )}

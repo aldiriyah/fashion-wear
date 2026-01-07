@@ -2,6 +2,13 @@ import { shippingInfo as staticShippingInfo } from "@/types/constants/shippingDa
 import { fetchContent } from "@/services/contentService";
 import React from "react";
 
+interface ShippingItem {
+  id: number | string;
+  title: string;
+  icon: React.ReactNode;
+  content: string;
+}
+
 const ShippingDelivery = async () => {
   const dynamicContent = await fetchContent("shipping-delivery");
   const data = dynamicContent || staticShippingInfo;
@@ -37,7 +44,7 @@ const ShippingDelivery = async () => {
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-          {data.map((item: any) => (
+          {data.map((item: ShippingItem) => (
             <div
               key={item.id}
               className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 relative overflow-hidden group"

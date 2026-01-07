@@ -13,7 +13,7 @@ export const fetchContent = async (slug: string) => {
   }
 };
 
-export const updateContent = async (slug: string, content: any) => {
+export const updateContent = async <T>(slug: string, content: T) => {
   try {
     const response = await fetch(`${api}/api/v1/content/${slug}`, {
       method: "POST",

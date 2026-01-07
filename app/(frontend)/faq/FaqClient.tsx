@@ -2,8 +2,15 @@
 import React, { useState } from "react";
 import { faqItems as staticFaqItems } from "@/types/constants/faq";
 
+interface FaqItem {
+  id: number;
+  question: string;
+  answer: string;
+  icon: React.ReactNode;
+}
+
 interface FaqClientProps {
-  faqItems: any[];
+  faqItems: FaqItem[];
 }
 
 const FaqClient: React.FC<FaqClientProps> = ({ faqItems: propFaqItems }) => {
@@ -37,7 +44,7 @@ const FaqClient: React.FC<FaqClientProps> = ({ faqItems: propFaqItems }) => {
 
         {/* FAQ Items */}
         <div className="space-y-4">
-          {faqItems.map((item: any) => (
+          {faqItems.map((item: FaqItem) => (
             <div
               id={`faq-item-${item.id}`}
               key={item.id}

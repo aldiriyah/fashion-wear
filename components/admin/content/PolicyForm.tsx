@@ -34,7 +34,7 @@ const PolicyForm: React.FC<Props> = ({ initialData, slug }) => {
   const handleSectionChange = (
     index: number,
     field: keyof PolicySection,
-    value: any
+    value: string | string[] | undefined
   ) => {
     const newSections = [...sections];
     newSections[index] = { ...newSections[index], [field]: value };

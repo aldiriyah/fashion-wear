@@ -1,7 +1,12 @@
-import { Browser, cookiePolicySections, CookieType, cookieTypes, PolicySections } from "@/types/constants/cookies";
+import {
+  Browser,
+  cookiePolicySections as staticCookiePolicySections,
+  CookieType,
+  cookieTypes as staticCookieTypes,
+  PolicySections,
+} from "@/types/constants/cookies";
+import { fetchContent } from "@/services/contentService";
 import React from "react";
-
-
 
 // Reusable Policy Section Component
 const PolicySection: React.FC<{ section: PolicySections }> = ({ section }) => (
@@ -20,17 +25,23 @@ const PolicySection: React.FC<{ section: PolicySections }> = ({ section }) => (
           </div>
         </div>
 
-        <p className="text-gray-600 leading-relaxed mb-4">
-          {section.content}
-        </p>
+        <p className="text-gray-600 leading-relaxed mb-4">{section.content}</p>
 
         {section.list && (
           <ul className="space-y-3 mt-4">
             {section.list.map((item: string, index: number) => (
               <li key={index} className="flex items-start gap-3 text-gray-600">
                 <span className="bg-amber-100 text-amber-600 rounded-full p-1 mt-1 flex-shrink-0">
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  <svg
+                    className="w-3 h-3"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </span>
                 {item}
@@ -56,22 +67,21 @@ const PolicySection: React.FC<{ section: PolicySections }> = ({ section }) => (
 );
 
 // Table Row Component
-const TableRow: React.FC<{ cookie: CookieType; index: number }> = ({ cookie }) => (
+const TableRow: React.FC<{ cookie: CookieType; index: number }> = ({
+  cookie,
+}) => (
   <tr className="hover:bg-amber-50 transition-colors duration-200">
-    <td className="px-6 py-4 font-medium text-gray-800">
-      {cookie.type}
-    </td>
-    <td className="px-6 py-4 text-gray-600">
-      {cookie.purpose}
-    </td>
-    <td className="px-6 py-4 text-gray-600">
-      {cookie.examples}
-    </td>
+    <td className="px-6 py-4 font-medium text-gray-800">{cookie.type}</td>
+    <td className="px-6 py-4 text-gray-600">{cookie.purpose}</td>
+    <td className="px-6 py-4 text-gray-600">{cookie.examples}</td>
   </tr>
 );
 
 // Browser Link Component
-const BrowserLink: React.FC<{ browser: Browser; index: number }> = ({ browser, index }) => (
+const BrowserLink: React.FC<{ browser: Browser; index: number }> = ({
+  browser,
+  index,
+}) => (
   <a
     key={index}
     href={browser.url}
@@ -85,8 +95,22 @@ const BrowserLink: React.FC<{ browser: Browser; index: number }> = ({ browser, i
 );
 
 // Main Component
-const CookiesPolicy: React.FC = () => {
-  
+const CookiesPolicy = async () => {
+  const dynamicContent = await fetchContent("cookie-policy");
+
+  // Destructure fetched data or fallback
+  // Seed structure: { sections: [...], cookieTypes: [...] }
+  const cookiePolicySections =
+    dynamicContent?.content?.sections ||
+    dynamicContent?.sections ||
+    staticCookiePolicySections;
+  const cookieTypes =
+    dynamicContent?.content?.cookieTypes ||
+    dynamicContent?.cookieTypes ||
+    staticCookieTypes;
+  // Note: checking dynamicContent?.content?.sections in case fetched data is wrapped weirdly, but fetchContent returns data.content from DB.
+  // In seed script: { content: { sections: cookiePolicySections, cookieTypes } }
+  // So fetched content IS { sections: ..., cookieTypes: ... }
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-8 md:py-16 lg:py-24 xl:py-28  px-4 sm:px-6 lg:px-0">
@@ -101,9 +125,11 @@ const CookiesPolicy: React.FC = () => {
               Effective Date: {new Date().toLocaleDateString()}
             </p>
             <p className="text-gray-600 leading-relaxed">
-              This Cookie Policy explains how Smart Wear uses cookies and similar technologies to recognize you 
-              when you visit our website, how they work, and how you can control them. At Smart Wear, we value 
-              your privacy and transparency. This policy should be read together with our Privacy Policy.
+              This Cookie Policy explains how Smart Wear uses cookies and
+              similar technologies to recognize you when you visit our website,
+              how they work, and how you can control them. At Smart Wear, we
+              value your privacy and transparency. This policy should be read
+              together with our Privacy Policy.
             </p>
           </div>
         </div>
@@ -133,9 +159,15 @@ const CookiesPolicy: React.FC = () => {
                   <table className="w-full">
                     <thead className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
                       <tr>
-                        <th className="px-6 py-4 text-left font-semibold">Type of Cookie</th>
-                        <th className="px-6 py-4 text-left font-semibold">Purpose</th>
-                        <th className="px-6 py-4 text-left font-semibold">Examples</th>
+                        <th className="px-6 py-4 text-left font-semibold">
+                          Type of Cookie
+                        </th>
+                        <th className="px-6 py-4 text-left font-semibold">
+                          Purpose
+                        </th>
+                        <th className="px-6 py-4 text-left font-semibold">
+                          Examples
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -161,9 +193,11 @@ const CookiesPolicy: React.FC = () => {
             Manage Cookies in Your Browser
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {cookiePolicySections[3]?.browsers?.map((browser: Browser, index: number) => (
-              <BrowserLink key={index} browser={browser} index={index} />
-            ))}
+            {cookiePolicySections[3]?.browsers?.map(
+              (browser: Browser, index: number) => (
+                <BrowserLink key={index} browser={browser} index={index} />
+              )
+            )}
           </div>
         </div>
 
@@ -171,8 +205,9 @@ const CookiesPolicy: React.FC = () => {
         <div className="bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-2xl p-8 mt-12 text-center">
           <h3 className="text-2xl font-bold mb-4">Cookie Control</h3>
           <p className="text-lg opacity-90 max-w-2xl mx-auto">
-            You&apos;re always in control of your cookie preferences. Use your browser settings 
-            or our cookie banner to manage how cookies are used on our website.
+            You&apos;re always in control of your cookie preferences. Use your
+            browser settings or our cookie banner to manage how cookies are used
+            on our website.
           </p>
         </div>
       </div>

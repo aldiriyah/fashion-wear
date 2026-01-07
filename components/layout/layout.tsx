@@ -58,6 +58,11 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         icon: "",
       },
       {
+        name: "Content Management",
+        href: "/admin/content-management",
+        icon: "📝",
+      },
+      {
         name: "Contact",
         href: "/admin/contact",
         icon: "✉️",
@@ -74,10 +79,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   // Auto-expand parent sections and handle mobile menu - combined into one effect
   useEffect(() => {
     // Auto-expand parent sections when on child routes
-    const currentSection = sections.find(section => 
-      section.children?.some(child => child.href === pathname)
+    const currentSection = sections.find((section) =>
+      section.children?.some((child) => child.href === pathname)
     );
-    
+
     if (currentSection) {
       setActiveSection(currentSection.name);
     }
@@ -95,22 +100,28 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     [pathname]
   );
 
-  const toggleSection = useCallback((sectionName: string) => {
-    setActiveSection(activeSection === sectionName ? null : sectionName);
-  }, [activeSection]);
+  const toggleSection = useCallback(
+    (sectionName: string) => {
+      setActiveSection(activeSection === sectionName ? null : sectionName);
+    },
+    [activeSection]
+  );
 
-  const handleNavigation = useCallback((href: string) => {
-    router.push(href);
-  }, [router]);
+  const handleNavigation = useCallback(
+    (href: string) => {
+      router.push(href);
+    },
+    [router]
+  );
 
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  
+
   // Get user email only once on component mount
   useEffect(() => {
     const email = localStorage.getItem("email");
     if (email) setUserEmail(email);
   }, []);
-  
+
   const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("email");
@@ -143,11 +154,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         <nav className="flex-1 overflow-y-auto p-4">
           <ul className="space-y-2">
             {sections.map((section) => {
-              const isParentActive = section.children 
-                ? section.children.some(child => isActiveUrl(child.href))
+              const isParentActive = section.children
+                ? section.children.some((child) => isActiveUrl(child.href))
                 : isActiveUrl(section.href);
-              
-              const shouldShowChildren = activeSection === section.name || isParentActive;
+
+              const shouldShowChildren =
+                activeSection === section.name || isParentActive;
 
               return (
                 <li key={section.name}>
@@ -215,7 +227,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="p-4 border-t border-gray-700">
           <div className="flex items-center justify-between space-x-3">
             <div className="flex items-center space-x-3">
-              <div 
+              <div
                 className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-600 transition-colors"
                 onClick={handleLogout}
                 title="Logout"
@@ -232,15 +244,15 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }, [
-    isMobile, 
-    isMobileMenuOpen, 
-    sections, 
-    isActiveUrl, 
-    activeSection, 
-    userEmail, 
-    toggleSection, 
-    handleNavigation, 
-    handleLogout
+    isMobile,
+    isMobileMenuOpen,
+    sections,
+    isActiveUrl,
+    activeSection,
+    userEmail,
+    toggleSection,
+    handleNavigation,
+    handleLogout,
   ]);
 
   // Set display name for the Sidebar component

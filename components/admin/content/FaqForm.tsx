@@ -12,7 +12,7 @@ interface FaqItem {
 }
 
 interface Props {
-  initialData: FaqItem[];
+  initialData: FaqItem[] | null;
   slug: string;
 }
 

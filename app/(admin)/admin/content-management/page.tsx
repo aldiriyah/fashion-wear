@@ -54,38 +54,46 @@ const contentTypes = [
     description: "Update contact details, address, social links, and hours.",
     color: "border-green-200 hover:border-green-500",
   },
+  {
+    title: "About Us",
+    slug: "about-us",
+    icon: <FaQuestionCircle className="text-4xl mb-4 text-indigo-500" />,
+    description: "Update the story, title, and heading of your brand.",
+    color: "border-indigo-200 hover:border-indigo-500",
+  },
 ];
 
 const ContentManagement = () => {
   return (
     <AdminLayoutWithAuth>
-    <div className="bg-white rounded-lg shadow-sm p-6 min-h-[80vh]">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">
-        Content Management
-      </h1>
-      <p className="text-gray-600 mb-8">
-        Select a page below to edit its content. You can modify text,
-        descriptions, and details. Icons and layout structure are fixed.
-      </p>
+      <div className="bg-white rounded-lg shadow-sm p-6 min-h-[80vh]">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">
+          Content Management
+        </h1>
+        <p className="text-gray-600 mb-8">
+          Select a page below to edit its content. You can modify text,
+          descriptions, and details. Icons and layout structure are fixed.
+        </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {contentTypes.map((item) => (
-          <Link
-            key={item.slug}
-            href={`/admin/content-management/${item.slug}`}
-            className={`bg-gray-50 rounded-xl p-8 shadow-sm border-2 ${item.color} transition-all duration-300 hover:shadow-md hover:-translate-y-1 block`}
-          >
-            <div className="flex flex-col items-center text-center">
-              {item.icon}
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
-                {item.title}
-              </h3>
-              <p className="text-gray-600 text-sm">{item.description}</p>
-            </div>
-          </Link>
-        ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {contentTypes.map((item) => (
+            <Link
+              key={item.slug}
+              href={`/admin/content-management/${item.slug}`}
+              className={`bg-gray-50 rounded-xl p-8 shadow-sm border-2 ${item.color} transition-all duration-300 hover:shadow-md hover:-translate-y-1 block`}
+            >
+              <div className="flex flex-col items-center text-center">
+                {item.icon}
+                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-gray-600 text-sm">{item.description}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
-    </div></AdminLayoutWithAuth>
+    </AdminLayoutWithAuth>
   );
 };
 

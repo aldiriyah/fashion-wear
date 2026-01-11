@@ -19,12 +19,27 @@ interface ContactInfo {
 }
 
 interface Props {
-  initialData: ContactInfo;
+  initialData: ContactInfo | null;
   slug: string;
 }
 
 const ContactForm: React.FC<Props> = ({ initialData, slug }) => {
-  const [data, setData] = useState<ContactInfo>(initialData);
+  const [data, setData] = useState<ContactInfo>(
+    initialData || {
+      address: "",
+      phones: ["", ""],
+      socials: {
+        facebook: "",
+        twitter: "",
+        instagram: "",
+        tiktok: "",
+      },
+      hours: {
+        sunday_thursday: "",
+        friday_saturday: "",
+      },
+    }
+  );
   const [saving, setSaving] = useState(false);
 
   // Simplified handler for nested updates

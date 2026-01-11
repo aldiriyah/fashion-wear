@@ -6,6 +6,7 @@ import PolicyForm from "@/components/admin/content/PolicyForm";
 import FaqForm from "@/components/admin/content/FaqForm";
 import CookiePolicyForm from "@/components/admin/content/CookiePolicyForm";
 import ContactForm from "@/components/admin/content/ContactForm";
+import AboutForm from "@/components/admin/content/AboutForm";
 import AdminLayoutWithAuth from "@/components/layout/layout";
 
 interface PageProps {
@@ -20,18 +21,8 @@ const EditContentPage = async ({ params }: PageProps) => {
   // Fetch initial data
   const contentData = await fetchContent(slug);
 
-  // If no data, we might want to show an error or a "create new" state,
-  // but since we seeded, it should exist.
-  // However, fetchContent returns just the 'content' field (the inner object/array).
-  // The forms expect exactly that inner object/array.
-
-  if (!contentData) {
-    return (
-      <div className="p-8 text-red-600">
-        Error: Content not found for slug &quot;{slug}&quot;
-      </div>
-    );
-  }
+  // We allow null contentData here so the forms can show a "new" state
+  // and create the entry on first save.
 
   const renderForm = () => {
     switch (slug) {
@@ -48,6 +39,8 @@ const EditContentPage = async ({ params }: PageProps) => {
         return <CookiePolicyForm initialData={contentData} slug={slug} />;
       case "contact-us":
         return <ContactForm initialData={contentData} slug={slug} />;
+      case "about-us":
+        return <AboutForm initialData={contentData} slug={slug} />;
       default:
         return <div>Unknown content type</div>;
     }

@@ -23,7 +23,7 @@ interface PolicySection {
 }
 
 interface Props {
-  initialData: PolicySection[];
+  initialData: PolicySection[] | null;
   slug: string;
 }
 

@@ -11,7 +11,7 @@ interface ShippingItem {
 }
 
 interface Props {
-  initialData: ShippingItem[]; // The array of items
+  initialData: ShippingItem[] | null; // The array of items
   slug: string;
 }
 

@@ -25,7 +25,7 @@ interface CookieStructure {
 }
 
 interface Props {
-  initialData: CookieStructure;
+  initialData: CookieStructure | null;
   slug: string;
 }
 
@@ -42,10 +42,10 @@ const CookiePolicyForm: React.FC<Props> = ({ initialData, slug }) => {
   // Or I manually implement both here to keep it clean.
 
   const [sections, setSections] = useState<CookieSection[]>(
-    initialData.sections || []
+    initialData?.sections || []
   );
   const [cookieTypes, setCookieTypes] = useState<CookieType[]>(
-    initialData.cookieTypes || []
+    initialData?.cookieTypes || []
   );
   const [activeTab, setActiveTab] = useState<"sections" | "types">("sections");
   const [saving, setSaving] = useState(false);

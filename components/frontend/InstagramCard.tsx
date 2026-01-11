@@ -15,9 +15,9 @@ const InstagramCard = ({ image, alt ,link }: InstagramCardProps) => {
       <Image
         src={image}
         alt={alt}
-        className="w-64 hover:cursor-pointer h-64 object-cover rounded-lg"
-        width={256}
-        height={256}
+        className="w-52 hover:cursor-pointer h-52 object-cover rounded-lg"
+        width={200}
+        height={200}
       />
       </Link>
     </div>

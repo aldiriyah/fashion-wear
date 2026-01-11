@@ -103,36 +103,38 @@ const Footer = () => {
   }, []);
 
   return (
-    <div className="bg-black text-white pt-6 md:pt-10">
-      <div className="container px-4 sm:px-6 lg:px-8 py-8 mx-auto">
+    <div className="bg-black text-white pt-4 md:pt-6">
+      <div className="container px-4 sm:px-6 lg:px-8 py-6 mx-auto">
         {/* Main grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Company info */}
           <div className="space-y-4">
-            <Image
-              src={footerData.companyInfo.logo}
-              alt="logo"
-              width={120}
-              height={120}
-              className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28"
-            />
-            <p className="text-base sm:text-lg leading-relaxed">
+            {footerData?.companyInfo?.logo && (
+              <Image
+                src={footerData.companyInfo.logo}
+                alt="logo"
+                width={100}
+                height={100}
+                className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24"
+              />
+            )}
+            <p className="text-sm sm:text-base leading-relaxed">
               {footerData.companyInfo.address}
             </p>
-            <p className="text-sm sm:text-base">
+            <p className="text-xs sm:text-sm">
               Company Registration Number:{" "}
               {footerData.companyInfo.companyRegistrationNumber}
             </p>
-            <p className="text-sm sm:text-base">
+            <p className="text-xs sm:text-sm">
               VAT Registration Number:{" "}
               {footerData.companyInfo.vatRegistrationNumber}
             </p>
           </div>
 
           {/* Categories */}
-          <div className="space-y-4">
-            <h3 className="text-lg sm:text-xl font-bold">Categories</h3>
-            <ul className="space-y-2 text-base sm:text-lg">
+          <div className="space-y-3">
+            <h3 className="text-base sm:text-lg font-bold">Categories</h3>
+            <ul className="space-y-1.5 text-sm sm:text-base">
               {footerData.categories.map((category, index) => (
                 <li key={index}>
                   <Link
@@ -147,9 +149,9 @@ const Footer = () => {
           </div>
 
           {/* Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg sm:text-xl font-bold">Information</h3>
-            <ul className="space-y-2 text-base sm:text-lg">
+          <div className="space-y-3">
+            <h3 className="text-base sm:text-lg font-bold">Information</h3>
+            <ul className="space-y-1.5 text-sm sm:text-base">
               {footerData.informationLinks.map((link, index) => (
                 <li key={index}>
                   <Link
@@ -164,10 +166,10 @@ const Footer = () => {
           </div>
 
           {/* Contact & Social */}
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="text-lg sm:text-xl font-bold">Get In Touch</h3>
-              <ul className="space-y-3 text-base sm:text-lg">
+          <div className="space-y-5">
+            <div className="space-y-3">
+              <h3 className="text-base sm:text-lg font-bold">Get In Touch</h3>
+              <ul className="space-y-2 text-sm sm:text-base">
                 <li>
                   <Link
                     href={`mailto:${footerData.contactInfo.email}`}
@@ -194,14 +196,14 @@ const Footer = () => {
             </div>
 
             {/* Social Media */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold">Follow Us</h4>
-              <ul className="flex items-center gap-4">
+            <div className="space-y-3">
+              <h4 className="text-base font-semibold">Follow Us</h4>
+              <ul className="flex items-center gap-3">
                 {footerData.socialMedia.map((social, index) => {
                   let Icon = FaFacebook;
                   if (social.platform === "instagram") Icon = FaInstagram;
                   else if (social.platform === "twitter") Icon = FaXTwitter;
-                  else if (social.platform === "linkedin") Icon = FaTiktok; 
+                  else if (social.platform === "linkedin") Icon = FaTiktok;
 
                   switch (social.platform) {
                     case "facebook":
@@ -215,10 +217,10 @@ const Footer = () => {
                       break;
                     case "linkedin":
                       Icon = FaTiktok;
-                      break; 
+                      break;
                     case "youtube":
                       Icon = FaTiktok;
-                      break; 
+                      break;
                     default:
                       Icon = FaFacebook;
                   }
@@ -232,8 +234,8 @@ const Footer = () => {
                         aria-label={social.platform}
                       >
                         <Icon
-                          size={24}
-                          className="sm:w-6 sm:h-6 lg:w-7 lg:h-7"
+                          size={20}
+                          className="sm:w-5 sm:h-5 lg:w-6 lg:h-6"
                         />
                       </Link>
                     </li>
@@ -245,8 +247,8 @@ const Footer = () => {
         </div>
 
         {/* Bottom section - Copyright */}
-        <div className="border-t border-gray-700 mt-8 pt-6 text-center">
-          <p className="text-sm sm:text-base text-gray-400">
+        <div className="border-t border-gray-700 mt-6 pt-4 text-center">
+          <p className="text-xs sm:text-sm text-gray-400">
             {footerData.copyright}
           </p>
         </div>

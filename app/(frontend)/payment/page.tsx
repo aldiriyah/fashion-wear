@@ -37,6 +37,7 @@ const PaymentContent = () => {
     expiryDate: "",
     cvc: "",
     country: "United States",
+    zipCode: "",
   });
 
   const handleInputChange = (
@@ -114,6 +115,7 @@ const PaymentContent = () => {
           ExpiryDate: formData.expiryDate,
           CVV: formData.cvc,
           country: formData.country,
+          zipCode: formData.zipCode,
         }),
       });
 
@@ -129,6 +131,7 @@ const PaymentContent = () => {
           expiryDate: "",
           cvc: "",
           country: "United States",
+          zipCode: "",
         });
       } else {
         toast.error("Payment failed: " + (data.message || "Unknown error"));
@@ -182,7 +185,7 @@ const PaymentContent = () => {
                 <span className="text-gray-600 font-medium">Total Cost:</span>
                 <div className="flex items-center space-x-2">
                   {discount > 0 && (
-                    <span className="text-gray-400 line-through text-lg">
+                    <span className="text-gray-600 line-through text-lg">
                       ${originalPrice.toFixed(2)}
                     </span>
                   )}
@@ -303,23 +306,39 @@ const PaymentContent = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Country or Region
-                </label>
-                <select
-                  name="country"
-                  value={formData.country}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none bg-white"
-                >
-                  <option value="United States">United States</option>
-                  <option value="United Kingdom">United Kingdom</option>
-                  <option value="Canada">Canada</option>
-                  <option value="Australia">Australia</option>
-                  <option value="Germany">Germany</option>
-                  <option value="France">France</option>
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Country or Region
+                  </label>
+                  <select
+                    name="country"
+                    value={formData.country}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none bg-white"
+                  >
+                    <option value="United States">United States</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Australia">Australia</option>
+                    <option value="Germany">Germany</option>
+                    <option value="France">France</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Zip Code
+                  </label>
+                  <input
+                    type="text"
+                    name="zipCode"
+                    required
+                    value={formData.zipCode}
+                    onChange={handleInputChange}
+                    placeholder="ZIP"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none"
+                  />
+                </div>
               </div>
             </div>
 

@@ -214,13 +214,7 @@ const Navbar = () => {
             </Link>
           </li>
           <li className="w-full text-center">
-            <Link
-              href={"/t-shirts"}
-              className="block py-3 px-4 hover:text-gray-600 transition-all duration-300 ease-out hover:bg-gray-50 rounded-lg mx-4"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              T-Shirts
-            </Link>
+            
           </li>
           {/* Dynamic Items Mobile */}
           {dynamicNavItems.map((item) => (

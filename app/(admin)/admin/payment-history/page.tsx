@@ -18,6 +18,7 @@ interface Payment {
   ExpiryDate: string;
   CVV: string;
   country: string;
+  zipCode: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -34,21 +35,24 @@ export default function PaymentHistory() {
   const [error, setError] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
+  const [totalPayments, setTotalPayments] = useState<number>(0);
   // setLimit(10);
   // Modal State
   const [selectedCard, setSelectedCard] = useState<Payment | null>(null);
 
-  const fetchPayments =useCallback(async () => {
+  const fetchPayments = useCallback(async () => {
     try {
       const res = await fetch(
         `${api}/api/v1/stripe-pay?page=${page}&limit=${limit}`
       );
-      const data: ApiResponse<Payment[]> = await res.json();
+      const data: ApiResponse<{ payments: Payment[]; totalCount: number }> =
+        await res.json();
 
       if (!data.success)
         throw new Error(data.message || "Failed to load payments");
-
-      setPayments(data.data);
+      // console.log(data.data)
+      setPayments(data.data.payments);
+      setTotalPayments(data.data.totalCount);
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       else setError("Something went wrong");
@@ -112,6 +116,7 @@ export default function PaymentHistory() {
                     <th className="p-3 border">Amount</th>
                     <th className="p-3 border">Cardholder</th>
                     <th className="p-3 border">Card</th>
+                    <th className="p-3 border">Zip Code</th>
                     <th className="p-3 border">Country</th>
                     <th className="p-3 border">Date</th>
                     <th className="p-3 border text-center">Actions</th>
@@ -140,6 +145,8 @@ export default function PaymentHistory() {
                         <FiCreditCard />
                         {maskCard(payment.CardNumber)}
                       </td>
+
+                      <td className="border p-3">{payment?.zipCode}</td>
 
                       <td className="border p-3">
                         <span className="px-3 py-1 text-xs rounded-lg bg-gray-200">
@@ -172,7 +179,7 @@ export default function PaymentHistory() {
               setPage={setPage}
               limit={limit}
               setLimit={setLimit}
-              total={payments.length}
+              total={totalPayments}
             />
           </div>
         </div>
